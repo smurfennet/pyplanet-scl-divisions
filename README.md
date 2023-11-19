@@ -4,6 +4,12 @@ The app provides commands to set-up the correct match settings based on the comp
 
 **All commands in this plugin can be used by everyone on the server. Ensure proper access control for the server you're driving on.** 
 
+## Installation
+* Download the latest release of this plugin;
+* Create a folder in the `apps` folder named `smurfen`;
+* Unpack the release into the `smurfen` folder (should create a `scl-divisions` folder);
+* Add `'apps.smurfen.scl-divisions'` to your list of apps in `settings/apps.py`.
+
 ## Normal use
 * Set the competition type: `/scl type (solo|team)`
   * For a solo match: `/scl type solo`
