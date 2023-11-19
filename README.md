@@ -20,6 +20,8 @@ The app provides commands to set-up the correct match settings based on the comp
   * [Solo] Provide the total amount of players
   * [Team] Provide the amount of players per team
 
+**DO NOT use these commands during the round, as it'll reset the server settings.**
+
 ## Extra commands
 ### End current round
 * `/scl endround`
