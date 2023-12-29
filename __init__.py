@@ -174,8 +174,14 @@ class SCLDivisionSupport(AppConfig):
 			repartition = '9, 6, 3'
 		elif self.setting_player_count == 4:
 			repartition = '12, 9, 6, 3'
-		elif self.setting_player_count >= 5:
+		elif self.setting_player_count == 5:
 			repartition = '15, 12, 9, 6, 3'
+		elif self.setting_player_count == 6:
+			repartition = '18, 15, 12, 9, 6, 3'
+		elif self.setting_player_count == 7:
+			repartition = '21, 18, 15, 12, 9, 6, 3'
+		elif self.setting_player_count >= 8:
+			repartition = '24, 21, 18, 15, 12, 9, 6, 3'
 
 		return repartition
 
