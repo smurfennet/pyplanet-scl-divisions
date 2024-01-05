@@ -105,7 +105,9 @@ class SCLDivisionSupport(AppConfig):
 
 	async def set_server_settings(self):
 		rounds_per_map = 10
-		points_limit = 150
+		points_limit = 150 \
+			if self.setting_type == 'team' \
+			else 250
 		points_repartition = await self.determine_team_points_repartition() \
 			if self.setting_type == 'team' \
 			else await self.determine_solo_points_repartition()
