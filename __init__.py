@@ -120,7 +120,7 @@ class SCLDivisionSupport(AppConfig):
 		mode_settings['S_RoundsPerMap'] = rounds_per_map
 		mode_settings['S_ForceLapsNb'] = 1
 		mode_settings['S_WarmUpDuration'] = -1
-		mode_settings['S_WarmUpNb'] = 1
+		mode_settings['S_WarmUpNb'] = 2
 		mode_settings['S_UseAlternateRules'] = False
 		mode_settings['S_UseTieBreak'] = False
 		mode_settings['S_PointsRepartition'] = points_repartition
