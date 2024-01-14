@@ -75,7 +75,7 @@ class SCLDivisionSupport(AppConfig):
 
 	async def chat_player_count(self, player, data, **kwargs):
 		# Set the amount of players.
-		if data.players is None or data.players < 2 or data.players > 8:
+		if data.players is None or data.players < 1 or data.players > 8:
 			message = '$i$f00You have to provide a correct amount of players!'
 			await self.instance.chat(message, player)
 			return
