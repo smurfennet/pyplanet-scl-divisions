@@ -96,18 +96,26 @@ class SCLDivisionSupport(AppConfig):
 			return
 
 		# Update the mode settings to up the amount of rounds per map.
-		mode_settings = await self.instance.mode_manager.get_settings()
-		mode_settings['S_RoundsPerMap'] = int(mode_settings['S_RoundsPerMap']) + 1
-		await self.instance.mode_manager.update_settings(mode_settings)
+		if self.setting_type == 'team':
+			mode_settings = await self.instance.mode_manager.get_settings()
+			mode_settings['S_RoundsPerMap'] = int(mode_settings['S_RoundsPerMap']) + 1
+			await self.instance.mode_manager.update_settings(mode_settings)
 
-		# End the round + inform players.
-		await self.instance.gbx.multicall(
-			self.instance.gbx('Trackmania.ForceEndRound', encode_json=False, response_id=False),
-			self.instance.chat('$fff{}$z$s$ff0 ended the round and increased the amount of rounds to play to $fff{}$ff0.'.format(
-				player.nickname,
-				mode_settings['S_RoundsPerMap']
-			))
-		)
+			# End the round + inform players.
+			await self.instance.gbx.multicall(
+				self.instance.gbx('Trackmania.ForceEndRound', encode_json=False, response_id=False),
+				self.instance.chat('$fff{}$z$s$ff0 ended the round and increased the amount of rounds to play to $fff{}$ff0.'.format(
+					player.nickname,
+					mode_settings['S_RoundsPerMap']
+				))
+			)
+
+		if self.setting_type == 'solo':
+			# End the round + inform players.
+			await self.instance.gbx.multicall(
+				self.instance.gbx('Trackmania.ForceEndRound', encode_json=False, response_id=False),
+				self.instance.chat('$fff{}$z$s$ff0 ended the round.'.format(player.nickname))
+			)
 
 	async def set_server_settings(self):
 		# Update the mode settings.
@@ -127,6 +135,7 @@ class SCLDivisionSupport(AppConfig):
 
 		if self.setting_type == 'solo':
 			mode_settings['S_FinishTimeout'] = 30
+			mode_settings['S_ChatTime'] = 20
 			mode_settings['S_AllowRespawn'] = True
 			mode_settings['S_PointsLimit'] = 150
 			mode_settings['S_RoundsPerMap'] = 5
