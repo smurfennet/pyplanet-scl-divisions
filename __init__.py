@@ -134,7 +134,6 @@ class SCLDivisionSupport(AppConfig):
 			mode_settings['S_WarmUpDuration'] = -1
 			mode_settings['S_WarmUpNb'] = 1
 			mode_settings['S_UseAlternateRules'] = False
-			mode_settings['S_UseTieBreak'] = False
 			mode_settings['S_NbOfWinners'] = 2
 			mode_settings['S_NbOfPlayersMax'] = 8
 			mode_settings['S_PointsRepartition'] = await self.determine_solo_points_repartition()
