@@ -61,6 +61,12 @@ class SCLDivisionSupport(AppConfig):
 			return
 
 		self.setting_type = data.type
+
+		mode = 'Rounds.Script.txt' \
+			if self.setting_type == 'team' \
+			else 'Cup.Script.txt'
+
+		await self.instance.mode_manager.set_next_script(mode)
 		await self.set_server_settings()
 
 	async def chat_team_count(self, player, data, **kwargs):
@@ -90,40 +96,57 @@ class SCLDivisionSupport(AppConfig):
 			return
 
 		# Update the mode settings to up the amount of rounds per map.
-		mode_settings = await self.instance.mode_manager.get_settings()
-		mode_settings['S_RoundsPerMap'] = int(mode_settings['S_RoundsPerMap']) + 1
-		await self.instance.mode_manager.update_settings(mode_settings)
+		if self.setting_type == 'team':
+			mode_settings = await self.instance.mode_manager.get_settings()
+			mode_settings['S_RoundsPerMap'] = int(mode_settings['S_RoundsPerMap']) + 1
+			await self.instance.mode_manager.update_settings(mode_settings)
 
-		# End the round + inform players.
-		await self.instance.gbx.multicall(
-			self.instance.gbx('Trackmania.ForceEndRound', encode_json=False, response_id=False),
-			self.instance.chat('$fff{}$z$s$ff0 ended the round and increased the amount of rounds to play to $fff{}$ff0.'.format(
-				player.nickname,
-				mode_settings['S_RoundsPerMap']
-			))
-		)
+			# End the round + inform players.
+			await self.instance.gbx.multicall(
+				self.instance.gbx('Trackmania.ForceEndRound', encode_json=False, response_id=False),
+				self.instance.chat('$fff{}$z$s$ff0 ended the round and increased the amount of rounds to play to $fff{}$ff0.'.format(
+					player.nickname,
+					mode_settings['S_RoundsPerMap']
+				))
+			)
+
+		if self.setting_type == 'solo':
+			# End the round + inform players.
+			await self.instance.gbx.multicall(
+				self.instance.gbx('Trackmania.ForceEndRound', encode_json=False, response_id=False),
+				self.instance.chat('$fff{}$z$s$ff0 ended the round.'.format(player.nickname))
+			)
 
 	async def set_server_settings(self):
-		rounds_per_map = 10
-		points_limit = 150 \
-			if self.setting_type == 'team' \
-			else 250
-		points_repartition = await self.determine_team_points_repartition() \
-			if self.setting_type == 'team' \
-			else await self.determine_solo_points_repartition()
-
 		# Update the mode settings.
 		mode_settings = await self.instance.mode_manager.get_settings()
-		mode_settings['S_FinishTimeout'] = 30
-		mode_settings['S_AllowRespawn'] = True
-		mode_settings['S_PointsLimit'] = points_limit
-		mode_settings['S_RoundsPerMap'] = rounds_per_map
-		mode_settings['S_ForceLapsNb'] = 1
-		mode_settings['S_WarmUpDuration'] = -1
-		mode_settings['S_WarmUpNb'] = 2
-		mode_settings['S_UseAlternateRules'] = False
-		mode_settings['S_UseTieBreak'] = False
-		mode_settings['S_PointsRepartition'] = points_repartition
+
+		if self.setting_type == 'team':
+			mode_settings['S_FinishTimeout'] = 30
+			mode_settings['S_AllowRespawn'] = True
+			mode_settings['S_PointsLimit'] = 150
+			mode_settings['S_RoundsPerMap'] = 10
+			mode_settings['S_ForceLapsNb'] = 1
+			mode_settings['S_WarmUpDuration'] = -1
+			mode_settings['S_WarmUpNb'] = 2
+			mode_settings['S_UseAlternateRules'] = False
+			mode_settings['S_UseTieBreak'] = False
+			mode_settings['S_PointsRepartition'] = await self.determine_team_points_repartition()
+
+		if self.setting_type == 'solo':
+			mode_settings['S_FinishTimeout'] = 30
+			mode_settings['S_ChatTime'] = 25
+			mode_settings['S_AllowRespawn'] = True
+			mode_settings['S_PointsLimit'] = 150
+			mode_settings['S_RoundsPerMap'] = 5
+			mode_settings['S_ForceLapsNb'] = 1
+			mode_settings['S_WarmUpDuration'] = -1
+			mode_settings['S_WarmUpNb'] = 1
+			mode_settings['S_UseAlternateRules'] = False
+			mode_settings['S_NbOfWinners'] = 2
+			mode_settings['S_NbOfPlayersMax'] = 8
+			mode_settings['S_PointsRepartition'] = await self.determine_solo_points_repartition()
+
 		await self.instance.mode_manager.update_settings(mode_settings)
 
 		message = '$06fCurrent matchsettings: $fff{}$06f [{}players: $fff{}$06f]'.format(
@@ -170,20 +193,16 @@ class SCLDivisionSupport(AppConfig):
 	async def determine_solo_points_repartition(self):
 		repartition = ''
 
-		if self.setting_player_count == 2:
-			repartition = '6, 3'
-		elif self.setting_player_count == 3:
-			repartition = '9, 6, 3'
-		elif self.setting_player_count == 4:
-			repartition = '12, 9, 6, 3'
+		if self.setting_player_count == 4:
+			repartition = '10, 6, 4, 2'
 		elif self.setting_player_count == 5:
-			repartition = '15, 12, 9, 6, 3'
+			repartition = '10, 8, 6, 4, 2'
 		elif self.setting_player_count == 6:
-			repartition = '18, 15, 12, 9, 6, 3'
+			repartition = '10, 8, 6, 4, 2, 1'
 		elif self.setting_player_count == 7:
-			repartition = '21, 18, 15, 12, 9, 6, 3'
+			repartition = '10, 8, 6, 4, 3, 2, 1'
 		elif self.setting_player_count >= 8:
-			repartition = '24, 21, 18, 15, 12, 9, 6, 3'
+			repartition = '10, 8, 6, 5, 4, 3, 2, 1'
 
 		return repartition
 
