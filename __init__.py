@@ -135,7 +135,7 @@ class SCLDivisionSupport(AppConfig):
 
 		if self.setting_type == 'solo':
 			mode_settings['S_FinishTimeout'] = 30
-			mode_settings['S_ChatTime'] = 20
+			mode_settings['S_ChatTime'] = 25
 			mode_settings['S_AllowRespawn'] = True
 			mode_settings['S_PointsLimit'] = 150
 			mode_settings['S_RoundsPerMap'] = 5
