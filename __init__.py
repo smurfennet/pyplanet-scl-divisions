@@ -61,6 +61,12 @@ class SCLDivisionSupport(AppConfig):
 			return
 
 		self.setting_type = data.type
+
+		mode = 'Rounds.Script.txt' \
+			if self.setting_type == 'team' \
+			else 'Cup.Script.txt'
+
+		await self.instance.mode_manager.set_next_script(mode)
 		await self.set_server_settings()
 
 	async def chat_team_count(self, player, data, **kwargs):
@@ -104,12 +110,6 @@ class SCLDivisionSupport(AppConfig):
 		)
 
 	async def set_server_settings(self):
-		mode = 'Rounds.Script.txt' \
-			if self.setting_type == 'team' \
-			else 'Cup.Script.txt'
-
-		await self.instance.mode_manager.set_next_script(mode)
-
 		# Update the mode settings.
 		mode_settings = await self.instance.mode_manager.get_settings()
 
