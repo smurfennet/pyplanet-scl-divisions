@@ -104,26 +104,41 @@ class SCLDivisionSupport(AppConfig):
 		)
 
 	async def set_server_settings(self):
-		rounds_per_map = 10
-		points_limit = 150 \
+		mode = 'Rounds.Script.txt' \
 			if self.setting_type == 'team' \
-			else 250
-		points_repartition = await self.determine_team_points_repartition() \
-			if self.setting_type == 'team' \
-			else await self.determine_solo_points_repartition()
+			else 'Cup.Script.txt'
+
+		await self.instance.mode_manager.set_next_script(mode)
 
 		# Update the mode settings.
 		mode_settings = await self.instance.mode_manager.get_settings()
-		mode_settings['S_FinishTimeout'] = 30
-		mode_settings['S_AllowRespawn'] = True
-		mode_settings['S_PointsLimit'] = points_limit
-		mode_settings['S_RoundsPerMap'] = rounds_per_map
-		mode_settings['S_ForceLapsNb'] = 1
-		mode_settings['S_WarmUpDuration'] = -1
-		mode_settings['S_WarmUpNb'] = 2
-		mode_settings['S_UseAlternateRules'] = False
-		mode_settings['S_UseTieBreak'] = False
-		mode_settings['S_PointsRepartition'] = points_repartition
+
+		if self.setting_type == 'team':
+			mode_settings['S_FinishTimeout'] = 30
+			mode_settings['S_AllowRespawn'] = True
+			mode_settings['S_PointsLimit'] = 150
+			mode_settings['S_RoundsPerMap'] = 10
+			mode_settings['S_ForceLapsNb'] = 1
+			mode_settings['S_WarmUpDuration'] = -1
+			mode_settings['S_WarmUpNb'] = 2
+			mode_settings['S_UseAlternateRules'] = False
+			mode_settings['S_UseTieBreak'] = False
+			mode_settings['S_PointsRepartition'] = await self.determine_team_points_repartition()
+
+		if self.setting_type == 'solo':
+			mode_settings['S_FinishTimeout'] = 30
+			mode_settings['S_AllowRespawn'] = True
+			mode_settings['S_PointsLimit'] = 150
+			mode_settings['S_RoundsPerMap'] = 5
+			mode_settings['S_ForceLapsNb'] = 1
+			mode_settings['S_WarmUpDuration'] = -1
+			mode_settings['S_WarmUpNb'] = 1
+			mode_settings['S_UseAlternateRules'] = False
+			mode_settings['S_UseTieBreak'] = False
+			mode_settings['S_NbOfWinners'] = 2
+			mode_settings['S_NbOfPlayersMax'] = 8
+			mode_settings['S_PointsRepartition'] = await self.determine_solo_points_repartition()
+
 		await self.instance.mode_manager.update_settings(mode_settings)
 
 		message = '$06fCurrent matchsettings: $fff{}$06f [{}players: $fff{}$06f]'.format(
@@ -170,20 +185,16 @@ class SCLDivisionSupport(AppConfig):
 	async def determine_solo_points_repartition(self):
 		repartition = ''
 
-		if self.setting_player_count == 2:
-			repartition = '6, 3'
-		elif self.setting_player_count == 3:
-			repartition = '9, 6, 3'
-		elif self.setting_player_count == 4:
-			repartition = '12, 9, 6, 3'
+		if self.setting_player_count == 4:
+			repartition = '10, 6, 4, 2'
 		elif self.setting_player_count == 5:
-			repartition = '15, 12, 9, 6, 3'
+			repartition = '10, 8, 6, 4, 2'
 		elif self.setting_player_count == 6:
-			repartition = '18, 15, 12, 9, 6, 3'
+			repartition = '10, 8, 6, 4, 2, 1'
 		elif self.setting_player_count == 7:
-			repartition = '21, 18, 15, 12, 9, 6, 3'
+			repartition = '10, 8, 6, 4, 3, 2, 1'
 		elif self.setting_player_count >= 8:
-			repartition = '24, 21, 18, 15, 12, 9, 6, 3'
+			repartition = '10, 8, 6, 5, 4, 3, 2, 1'
 
 		return repartition
 
